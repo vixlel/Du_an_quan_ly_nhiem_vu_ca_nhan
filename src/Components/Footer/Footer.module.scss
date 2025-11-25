@@ -1,6 +1,6 @@
 .footerContainer {
-  background-color: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--white);
+  border-top: 1px solid var(--border-color);
   padding: 0.75rem 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -12,10 +12,8 @@
   // right: 0;
   width: 100%;
   height: 70px;
-
-  /* Thêm dòng này để Footer không bị co lại khi màn hình nhỏ */
   flex-shrink: 0;
-  position: relative; /* Để đảm bảo z-index hoạt động nếu cần shadow */
+  position: relative;
   z-index: 10;
 }
 
@@ -31,25 +29,27 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.85rem;
-  color: #64748b;
+  font-size: 1.6rem;
+  color: var(--text-light);
 }
 
 .iconSuccess {
-  color: #10b981;
+  /* SỬA: Dùng luôn màu primary cho đồng bộ */
+  color: var(--primary);
 }
 
 .progressBarContainer {
   width: 100%;
   height: 6px;
-  background-color: #f1f5f9;
+  background-color: var(--bg-hover);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .progressBarFill {
   height: 100%;
-  background-color: #3b82f6;
+  /* SỬA: Thanh tiến độ màu xanh lá */
+  background-color: var(--primary);
   border-radius: 10px;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -77,30 +77,32 @@
 }
 
 .navLabel {
-  font-size: 0.7rem;
+  font-size: 1.4rem;
   font-weight: 600;
 }
 
 /* Hover State */
 .navItem:hover {
-  background-color: #f8fafc;
-  color: #64748b;
+  background-color: var(--bg-hover);
+  color: var(--text-light);
 }
 
 /* Active State (Đang ở trang đó) */
 .navItem.active {
-  color: #3b82f6;
-  background-color: #eff6ff;
+  /* SỬA: Icon active màu xanh lá */
+  color: var(--primary);
+  /* SỬA: Nền active màu xanh lá nhạt (Primary BG) */
+  background-color: var(--primary-bg);
 }
 
 /* --- Mobile Responsive --- */
 @media (max-width: 640px) {
   .statusSection {
-    display: none; /* Ẩn thanh tiến độ trên mobile để tiết kiệm chỗ */
+    display: none;
   }
 
   .footerContainer {
-    justify-content: space-around; /* Dàn đều các nút */
+    justify-content: space-around;
     padding: 0.5rem;
   }
 

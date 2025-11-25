@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import './GlobalStyles.scss';
 import type { ChildrenType } from '~/types';
 
 const GlobalStyles = ({ children }: ChildrenType) => {
