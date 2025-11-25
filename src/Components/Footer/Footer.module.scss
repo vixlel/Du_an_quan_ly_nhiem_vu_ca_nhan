@@ -6,14 +6,17 @@
   justify-content: space-between;
   align-items: center;
 
-  /* Thay đổi vị trí: */
-  position: absolute; /* Thay vì fixed */
-  bottom: 0;
-  left: 0;
-  right: 0; /* Tự động giãn full chiều rộng của cha (div content) */
+  // position: absolute;
+  // bottom: 0;
+  // left: 0;
+  // right: 0;
   width: 100%;
   height: 70px;
-  /* ... */
+
+  /* Thêm dòng này để Footer không bị co lại khi màn hình nhỏ */
+  flex-shrink: 0;
+  position: relative; /* Để đảm bảo z-index hoạt động nếu cần shadow */
+  z-index: 10;
 }
 
 /* --- Status Section (Bên trái) --- */
