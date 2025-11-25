@@ -1,10 +1,13 @@
+/* Calendar.module.scss */
+
 .calendarContainer {
-  width: 100%; /* Quan trọng: Chiếm hết chiều rộng của cha (div flex: 1) */
-  height: 100%;
+  width: 100%;
+  height: 100%; /* Chiếm toàn bộ không gian của wrapper cha */
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 20px 20px 0 20px; /* Bỏ padding bottom để grid chạm đáy đẹp hơn */
   background-color: #fff;
+  overflow: hidden; /* Ngăn container này cuộn, chỉ cuộn grid bên trong */
 }
 
 /* --- HEADER --- */
@@ -13,12 +16,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-shrink: 0; /* Header không bị co lại khi thiếu chỗ */
 }
 
 .headerTitle h2 {
   margin: 0;
   font-size: 1.5rem;
-  text-transform: capitalize; /* Viết hoa chữ cái đầu (Tháng mười...) */
+  text-transform: capitalize;
 }
 
 .navButtons {
@@ -47,6 +51,8 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   margin-bottom: 10px;
+  flex-shrink: 0; /* Header thứ trong tuần luôn hiển thị */
+  padding-right: 4px; /* Bù trừ cho scrollbar của grid bên dưới nếu cần */
 }
 
 .weekDayCell {
@@ -60,14 +66,28 @@
 .daysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  /* Tự động tính chiều cao để lấp đầy màn hình, trừ header và padding */
-  grid-auto-rows: minmax(100px, 1fr);
+  /* Chiều cao tối thiểu mỗi ô */
+  grid-auto-rows: minmax(120px, 1fr);
   gap: 1px;
-  background-color: #e2e8f0; /* Tạo border cho grid */
+  background-color: #e2e8f0;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  overflow: hidden;
-  flex: 1; /* Quan trọng: Giúp lịch giãn hết chiều cao */
+
+  /* QUAN TRỌNG: Xử lý cuộn */
+  flex: 1; /* Giãn hết phần còn lại */
+  overflow-y: auto; /* Thanh cuộn sẽ nằm ở đây */
+
+  /* Tinh chỉnh thanh cuộn cho đẹp */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
 }
 
 .dayCell {
@@ -78,6 +98,7 @@
   flex-direction: column;
   gap: 4px;
   transition: background 0.2s;
+  min-height: 100%; /* Đảm bảo ô luôn full chiều cao */
 }
 
 .dayCell:hover {
@@ -85,7 +106,7 @@
 }
 
 .dayCell.disabled {
-  background-color: #f8fafc;
+  background-color: #f9f9f9;
   color: #cbd5e1;
 }
 
@@ -110,7 +131,7 @@
   margin-bottom: 4px;
 }
 
-/* --- TASK PREVIEW (trong ô lịch) --- */
+/* --- TASK PREVIEW --- */
 .taskPreviewList {
   display: flex;
   flex-direction: column;
@@ -134,7 +155,7 @@
   padding-left: 4px;
 }
 
-/* --- MODAL --- */
+/* --- MODAL (Giữ nguyên) --- */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -145,7 +166,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200; /* Cao hơn Footer */
+  z-index: 999; /* Đảm bảo cao hơn tất cả */
 }
 
 .modalContent {
