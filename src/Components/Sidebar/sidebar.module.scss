@@ -1,23 +1,27 @@
 .sidebar {
   width: 270px;
   height: 100%;
-  background: linear-gradient(180deg, #3b82f6 0%, #60a5fa 100%);
+
+  /* SỬA: Dùng gradient xanh lá từ bộ màu */
+  background: linear-gradient(
+    180deg,
+    var(--primary) 0%,
+    var(--primary-light) 100%
+  );
+
   padding: 1.6rem 1.2rem;
   display: flex;
   flex-direction: column;
-  // position: fixed;
-  // left: 0;
-  // top: 0;
-  flex-shrink: 0; /* Đảm bảo Sidebar không bị co nhỏ lại khi màn hình hẹp */
+  flex-shrink: 0;
   overflow-y: auto;
 
   @media (max-width: 768px) {
     width: 100%;
     height: auto;
-    // position: relative;
   }
 }
 
+/* ... Giữ nguyên phần Profile ... */
 .profile {
   text-align: center;
   margin-bottom: 2rem;
@@ -54,14 +58,14 @@
 }
 
 .name {
-  font-size: 1.2rem;
+  font-size: 1.8rem;
   font-weight: 600;
   color: white;
   margin-bottom: 0.3rem;
 }
 
 .email {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 400;
 }
@@ -80,7 +84,7 @@
   padding: 1.1rem 1.4rem;
   border-radius: 1.2rem;
   color: white;
-  font-size: 1rem;
+  font-size: 1.6rem;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -93,7 +97,8 @@
 
   &.active {
     background: white;
-    color: #3b82f6;
+    /* SỬA: Text chuyển sang màu xanh lá chủ đạo */
+    color: var(--primary);
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
@@ -114,7 +119,7 @@
   padding: 1.1rem 1.4rem;
   border-radius: 1.2rem;
   color: white;
-  font-size: 1rem;
+  font-size: 1.6rem;
   font-weight: 500;
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -132,7 +137,7 @@
   }
 }
 
-// Scrollbar styling
+/* Scrollbar styling */
 .sidebar::-webkit-scrollbar {
   width: 6px;
 }

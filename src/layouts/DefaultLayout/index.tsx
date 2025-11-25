@@ -1,9 +1,13 @@
 /* DefaultLayout.tsx */
 import React from 'react';
-import Footer from '~/components/Footer';
-import Sidebar from '~/components/Sidebar';
-import Header from '~/components/Header';
+import classNames from 'classnames/bind';
 
+import Footer from '~/components/Footer';
+import Header from '~/components/Header';
+import Sidebar from '~/components/Sidebar';
+import styles from './DefaultLayout.module.scss';
+
+const cx = classNames.bind(styles);
 interface DefaultLayoutProps {
   children: React.ReactNode;
 }
