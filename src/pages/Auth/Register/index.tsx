@@ -9,7 +9,7 @@ import styles from '../Auth.module.scss';
 
 // Vẫn dùng chung ảnh nền lá cây để tạo sự đồng bộ,
 // hoặc bạn có thể đổi ảnh khác nếu muốn
-const registerBg = images.general.productivity;
+const registerBg = images.general.todolist;
 
 const cx = classNames.bind(styles);
 

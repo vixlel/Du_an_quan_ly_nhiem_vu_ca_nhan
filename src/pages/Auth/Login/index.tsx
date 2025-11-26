@@ -10,7 +10,7 @@ import styles from '../Auth.module.scss';
 // Đổi đường dẫn ảnh này thành ảnh thực tế trong dự án của bạn
 // Ví dụ: import loginBg from '~/assets/images/leaf-bg.jpg';
 // Tạm thời mình dùng link ảnh online để bạn thấy demo ngay
-const loginBg = images.general.productivity;
+const loginBg = images.general.todolist;
 const cx = classNames.bind(styles);
 
 const Login: React.FC = () => {
