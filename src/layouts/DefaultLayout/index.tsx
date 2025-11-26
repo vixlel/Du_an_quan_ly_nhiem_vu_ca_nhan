@@ -53,7 +53,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
           </div>
 
           {/* Footer nằm dưới cùng, không bị che, không đè lên content */}
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, marginTop: 30 }}>
             <Footer />
           </div>
         </div>
