@@ -53,10 +53,10 @@
 
     display: block;
 
-    border-left: 3px solid var(--primary-dark);
+    // border-left: 3px solid var(--primary-dark);
 
-    // border-top-left-radius: 30px;
-    // border-bottom-left-radius: 30px;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
   }
 }
 
