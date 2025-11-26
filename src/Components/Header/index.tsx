@@ -108,7 +108,7 @@ const Header = () => {
               <h4
                 style={{
                   margin: '0 0 8px 12px',
-                  fontSize: '0.85rem',
+                  fontSize: '1.6rem',
                   color: '#94a3b8',
                 }}
               >
