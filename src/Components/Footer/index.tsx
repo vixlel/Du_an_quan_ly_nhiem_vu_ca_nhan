@@ -5,32 +5,41 @@ import {
   Calendar,
   Settings,
   CheckCircle2,
+  ChevronDown, // Import thêm icon
 } from 'lucide-react';
 import styles from './Footer.module.scss';
 
-// Props nhận dữ liệu task (có thể truyền từ DefaultLayout hoặc Global State sau này)
+// Thêm prop onToggle
 interface FooterProps {
   totalTasks?: number;
   completedTasks?: number;
+  onToggle?: () => void; // Hàm để báo lên Layout là muốn ẩn đi
 }
 
 const Footer: React.FC<FooterProps> = ({
-  totalTasks = 10, // Giá trị mặc định giả lập (mock)
-  completedTasks = 7, // Giá trị mặc định giả lập (mock)
+  totalTasks = 10,
+  completedTasks = 7,
+  onToggle,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Hàm kiểm tra route hiện tại để highlight button
   const isActive = (path: string) => location.pathname === path;
-
-  // Tính phần trăm
   const progressPercentage =
     totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
   return (
     <footer className={styles.footerContainer}>
-      {/* --- Phần Status (Tiến độ công việc) --- */}
+      {/* Nút Ẩn Footer (Collapse) - Đặt tuyệt đối hoặc ngay đầu */}
+      <button
+        onClick={onToggle}
+        title="Ẩn thanh điều hướng"
+        className={styles.collapseBtn} // Sẽ thêm style ở bước sau
+      >
+        <ChevronDown size={18} />
+      </button>
+
+      {/* --- Phần Status --- */}
       <div className={styles.statusSection}>
         <div className={styles.progressInfo}>
           <CheckCircle2 size={20} className={styles.iconSuccess} />

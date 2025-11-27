@@ -1,6 +1,6 @@
-/* DefaultLayout.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames/bind';
+import { ChevronUp } from 'lucide-react'; // Icon mũi tên lên
 
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
@@ -8,54 +8,64 @@ import Sidebar from '~/components/Sidebar';
 import styles from './DefaultLayout.module.scss';
 
 const cx = classNames.bind(styles);
+
 interface DefaultLayoutProps {
   children: React.ReactNode;
 }
 
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
+  // State quản lý việc hiển thị Footer
+  const [showFooter, setShowFooter] = useState(true);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      {/* 1. Header cố định chiều cao */}
+      {/* 1. Header */}
       <div style={{ flexShrink: 0 }}>
         <Header />
       </div>
 
-      {/* 2. Container chính: Sidebar (Trái) - Content (Phải) */}
+      {/* 2. Container chính */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Khu vực Nội dung + Footer */}
         <div
           style={{
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            overflow: 'hidden', // KHÓA SCROLL CỦA LAYOUT CHÍNH
+            overflow: 'hidden',
           }}
         >
-          {/* Vùng chứa nội dung (Calendar/Dashboard...):
-             - flex: 1 để chiếm hết khoảng trống còn lại.
-             - overflow: hidden để nhường quyền cuộn cho component con (Calendar).
-          */}
+          {/* Content Area */}
           <div
             style={{
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
+              overflow: 'hidden', // Quan trọng: đè scroll của con
               position: 'relative',
             }}
           >
-            {/* Wrapper này đảm bảo children nhận height 100% */}
             <div style={{ width: '100%', height: '100%' }}>{children}</div>
           </div>
 
-          {/* Footer nằm dưới cùng, không bị che, không đè lên content */}
-          <div style={{ flexShrink: 0, marginTop: 30 }}>
-            <Footer />
-          </div>
+          {/* Footer Area */}
+          {showFooter ? (
+            <div style={{ flexShrink: 0, marginTop: 0 }}>
+              {' '}
+              {/* Bỏ marginTop cứng nếu muốn liền mạch */}
+              <Footer onToggle={() => setShowFooter(false)} />
+            </div>
+          ) : (
+            /* Nút mở lại Footer (Khi Footer bị ẩn) */
+            <div
+              className={cx('restoreFooterBtn')}
+              onClick={() => setShowFooter(true)}
+            >
+              <ChevronUp size={16} />
+            </div>
+          )}
         </div>
       </div>
     </div>
