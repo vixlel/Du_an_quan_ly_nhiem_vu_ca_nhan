@@ -24,7 +24,7 @@
     font-weight: 700;
     color: var(--text-main);
     margin: 0;
-    margin-bottom: 4;
+    margin-bottom: 4px;
   }
   .subtitle {
     font-size: 1.4rem;
@@ -130,7 +130,7 @@
   }
 
   .cardFooter {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     border-top: 1px dashed var(--border-color);
     padding-top: 1.2rem;
 
@@ -166,7 +166,7 @@
     .date {
       margin-top: 0.8rem;
       color: var(--text-light);
-      font-size: 1.1rem;
+      font-size: 1.4rem;
       text-align: right;
     }
   }
