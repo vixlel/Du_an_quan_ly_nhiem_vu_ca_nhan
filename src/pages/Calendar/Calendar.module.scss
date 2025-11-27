@@ -293,6 +293,7 @@
 
 /* List View Specific */
 .listViewHeader {
+  padding: 0 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -321,8 +322,8 @@
 }
 
 .taskList {
+  padding: 0 32px;
   list-style: none;
-  padding: 0;
   margin: 0;
 }
 
