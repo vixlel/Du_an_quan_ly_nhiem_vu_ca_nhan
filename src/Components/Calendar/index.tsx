@@ -218,6 +218,7 @@ const Calendar: React.FC = () => {
                   onChange={(e) => setTaskInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSaveTask()}
                   autoFocus
+                  spellCheck={false}
                 />
                 <button className={styles.addBtn} onClick={handleSaveTask}>
                   {editingTask ? 'Lưu' : <Plus size={18} />}

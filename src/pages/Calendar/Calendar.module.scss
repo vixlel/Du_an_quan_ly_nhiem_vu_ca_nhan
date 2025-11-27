@@ -1,0 +1,289 @@
+/* Calendar.module.scss */
+
+.calendarContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 0 20px;
+  background-color: var(--white);
+  overflow: hidden;
+}
+
+/* --- HEADER --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.headerTitle h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  text-transform: capitalize;
+}
+
+.navButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.navButtons button {
+  background: var(--bg-hover);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.navButtons button:hover {
+  background: var(--border-color);
+}
+
+/* --- GRID LAYOUT --- */
+.weekDaysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  padding-right: 4px;
+}
+
+.weekDayCell {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(120px, 1fr);
+  gap: 1px;
+  background-color: var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  flex: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
+}
+
+.dayCell {
+  background-color: var(--white);
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: background 0.2s;
+  min-height: 100%;
+}
+
+.dayCell:hover {
+  background-color: var(--bg-hover);
+}
+
+.dayCell.disabled {
+  background-color: #f9f9f9;
+  color: #cbd5e1;
+}
+
+.dayCell.today {
+  /* SỬA: Nền ô hôm nay màu xanh lá nhạt */
+  background-color: var(--primary-bg);
+}
+
+.dayCell.today .dateNumber {
+  /* SỬA: Số ngày hôm nay nền xanh đậm */
+  background-color: var(--primary);
+  color: var(--white);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dateNumber {
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+/* --- TASK PREVIEW --- */
+.taskPreviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.taskDot {
+  font-size: 1.4rem;
+  /* SỬA: Tag công việc nền xanh nhạt, chữ xanh đậm */
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.moreTasks {
+  font-size: 0.7rem;
+  color: var(--text-light);
+  padding-left: 4px;
+}
+
+/* --- MODAL --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalContent {
+  background: var(--white);
+  width: 400px;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--bg-hover);
+  padding-bottom: 10px;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modalHeader button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+.taskList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.taskItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  border-bottom: 1px solid var(--bg-hover);
+}
+
+.taskItem:hover {
+  background-color: var(--bg-hover);
+}
+
+.editing {
+  /* SỬA: Text đang sửa màu xanh lá */
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.deleteBtn:hover {
+  opacity: 1;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.inputGroup input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  outline: none;
+}
+
+.inputGroup input:focus {
+  /* SỬA: Viền focus xanh lá */
+  border-color: var(--primary);
+}
+
+.addBtn {
+  /* SỬA: Nút thêm xanh lá */
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background-color: var(--primary-dark);
+}
+
+.emptyText {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

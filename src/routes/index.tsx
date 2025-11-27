@@ -1,12 +1,11 @@
 import React, { Fragment } from 'react'; // Fragment dùng làm layout trống nếu chưa có AuthLayout
 import Cart from '~/pages/Cart';
+import Calendar from '~/pages/Calendar';
 import Dashboard from '~/pages/Dashboard';
 import { Login, Register } from '~/pages/Auth'; // Import từ file index.tsx bạn đã tạo
 import DefaultLayout from '~/layouts/DefaultLayout';
 // Giả sử bạn đã tạo AuthLayout, nếu chưa thì import tạm DefaultLayout hoặc null
 import AuthLayout from '~/layouts/AuthLayout';
-
-import type { ChildrenType } from '~/types';
 
 type RouteType = {
   path: string;
@@ -24,6 +23,7 @@ const publicRoutes: RouteType[] = [
 // 2. PRIVATE ROUTES (Phải đăng nhập mới vào được: Dashboard)
 const privateRoutes: RouteType[] = [
   { path: '/', component: Dashboard, layout: DefaultLayout },
+  { path: '/calendar', component: Calendar, layout: DefaultLayout },
 ];
 
 export { publicRoutes, privateRoutes };
