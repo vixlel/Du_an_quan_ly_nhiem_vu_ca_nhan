@@ -65,7 +65,7 @@ const Header = () => {
         <div className={cx('logo')}>
           <Link to="/">
             <CheckSquare size={26} strokeWidth={2.5} />
-            <span>To Do</span>
+            <span>iTask</span>
           </Link>
         </div>
       </div>
