@@ -11,11 +11,11 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  Users, // Icon cho Group
-  PlusCircle, // Icon để thêm Group
-  Hash, // Icon đại diện cho ID hoặc Group
+  PlusCircle,
+  Hash,
+  ChevronLeft, // [MỚI] Import icon mũi tên trái để làm nút đóng
 } from 'lucide-react';
-import styles from './Sidebar.module.scss'; // Lưu ý check lại tên file (viết hoa/thường)
+import styles from './Sidebar.module.scss';
 import GroupModal from '~/components/GroupModal/GroupModal';
 
 const cx = classNames.bind(styles);
@@ -26,23 +26,24 @@ interface SidebarProps {
     email: string;
     avatar?: string;
   };
+  // [MỚI] Thêm prop này để nhận hàm từ Layout
+  onToggle?: () => void;
 }
 
-// 1. Định nghĩa Interface cho Group
+// ... (Phần Interface Group và MOCK_GROUPS giữ nguyên) ...
 interface Group {
   id: string;
   name: string;
   memberCount: number;
 }
-
-// 2. Fake Data cho Groups
 const MOCK_GROUPS: Group[] = [
   { id: 'dev-team', name: 'Dev Team Frontend', memberCount: 5 },
   { id: 'marketing', name: 'Marketing Campaign', memberCount: 8 },
   { id: 'study', name: 'English Class', memberCount: 12 },
 ];
 
-const Sidebar = ({ user }: SidebarProps) => {
+const Sidebar = ({ user, onToggle }: SidebarProps) => {
+  // Destructuring thêm onToggle
   const location = useLocation();
 
   const menuItems = [
@@ -56,14 +57,22 @@ const Sidebar = ({ user }: SidebarProps) => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
-
-  // 3. State điều khiển Modal
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
 
   return (
     <div className={cx('sidebar')}>
+      {/* --- [MỚI] Nút Collapse nằm góc trên phải --- */}
+      <button
+        className={cx('collapseBtn')}
+        onClick={onToggle}
+        title="Thu gọn Sidebar"
+      >
+        <ChevronLeft size={20} />
+      </button>
+
       {/* User Profile Section */}
       <div className={cx('profile')}>
+        {/* ... Code cũ giữ nguyên ... */}
         <div className={cx('avatar')}>
           {user?.avatar ? (
             <img src={user.avatar} alt={user.name} />
@@ -77,8 +86,9 @@ const Sidebar = ({ user }: SidebarProps) => {
         <p className={cx('email')}>{user?.email || 'guest@example.com'}</p>
       </div>
 
-      {/* Navigation Menu (Personal) */}
+      {/* Navigation Menu */}
       <nav className={cx('menu')}>
+        {/* ... Code cũ giữ nguyên ... */}
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -93,18 +103,17 @@ const Sidebar = ({ user }: SidebarProps) => {
           );
         })}
 
-        {/* --- 3. Phần Groups Mới --- */}
         <div className={cx('group-section')}>
+          {/* ... Code cũ giữ nguyên ... */}
           <div className={cx('group-label')}>
             <span>GROUPS</span>
             <span className={cx('badge')}>{MOCK_GROUPS.length}</span>
           </div>
 
-          {/* List các Group đã tham gia */}
           {MOCK_GROUPS.map((group) => (
             <Link
               key={group.id}
-              to={`/groups/${group.id}`} // Đường dẫn giả định
+              to={`/groups/${group.id}`}
               className={cx('menu-item', 'group-item', {
                 active: isActive(`/groups/${group.id}`),
               })}
@@ -114,10 +123,9 @@ const Sidebar = ({ user }: SidebarProps) => {
             </Link>
           ))}
 
-          {/* 4. Sửa nút Button để gọi hàm mở Modal */}
           <button
             className={cx('add-group-btn')}
-            onClick={() => setIsGroupModalOpen(true)} // <--- Thêm sự kiện onClick
+            onClick={() => setIsGroupModalOpen(true)}
           >
             <PlusCircle size={18} />
             <span>Join or Create Group</span>
@@ -131,7 +139,6 @@ const Sidebar = ({ user }: SidebarProps) => {
         <span>Logout</span>
       </button>
 
-      {/* 5. Render Modal ở cuối cùng (ngoài thẻ nav nhưng trong div sidebar hoặc ngoài cùng đều được vì nó là fixed position) */}
       <GroupModal
         isOpen={isGroupModalOpen}
         onClose={() => setIsGroupModalOpen(false)}

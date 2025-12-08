@@ -39,3 +39,37 @@
     padding-bottom: 4px; /* Giữ icon cân đối khi nút cao lên */
   }
 }
+
+/* --- [MỚI] Nút mở lại Sidebar (Nằm bên trái) --- */
+.restoreSidebarBtn {
+  position: absolute;
+  left: 0;
+  /* Căn giữa theo chiều dọc */
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Hình dáng dọc */
+  width: 24px;
+  height: 48px;
+
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-left: none; /* Bỏ viền trái để dính vào mép */
+  border-radius: 0 12px 12px 0; /* Bo tròn 2 góc bên phải */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50; /* Cao hơn content để bấm được */
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  color: var(--text-light);
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--primary);
+    background-color: var(--primary-bg);
+    width: 32px; /* Trồi ra khi hover */
+    padding-left: 4px;
+  }
+}
