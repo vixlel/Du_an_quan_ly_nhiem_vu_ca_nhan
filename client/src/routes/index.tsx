@@ -1,12 +1,17 @@
-import React, { Fragment } from 'react';
+import React from 'react';
+
+// Pages
 import Cart from '~/pages/Cart';
+import Group from '~/pages/Group/Group';
+import MyTask from '~/pages/MyTask/MyTask';
+import { Login, Register } from '~/pages/Auth';
 import Calendar from '~/pages/Calendar/Calendar';
 import Dashboard from '~/pages/Dashboard/Dashboard';
-import { Login, Register } from '~/pages/Auth';
-import DefaultLayout from '~/layouts/DefaultLayout';
 import TaskCategories from '~/pages/TaskCategories/TaskCategories';
-import MyTask from '~/pages/MyTask/MyTask';
+
+// Layouts
 import AuthLayout from '~/layouts/AuthLayout';
+import DefaultLayout from '~/layouts/DefaultLayout';
 
 // Giả định bạn sẽ tạo trang này để xem chi tiết 1 nhóm
 // Nếu chưa có, bạn có thể tạo file rỗng để không bị lỗi import
@@ -38,9 +43,7 @@ const privateRoutes: RouteType[] = [
     component: TaskCategories,
     layout: DefaultLayout,
   },
-
-  // Route mới cho Group (ví dụ: /groups/123abcxyz)
-  { path: '/groups/:groupId', component: GroupDetail, layout: DefaultLayout },
+  { path: '/groups/:groupId', component: Group, layout: DefaultLayout },
 ];
 
 export { publicRoutes, privateRoutes };
