@@ -1,13 +1,19 @@
-import React, { Fragment } from 'react'; // Fragment dùng làm layout trống nếu chưa có AuthLayout
+import React, { Fragment } from 'react';
 import Cart from '~/pages/Cart';
-import Calendar from '~/pages/Calendar';
-import Dashboard from '~/pages/Dashboard';
-import { Login, Register } from '~/pages/Auth'; // Import từ file index.tsx bạn đã tạo
+import Calendar from '~/pages/Calendar/Calendar';
+import Dashboard from '~/pages/Dashboard/Dashboard';
+import { Login, Register } from '~/pages/Auth';
 import DefaultLayout from '~/layouts/DefaultLayout';
-import TaskCategories from '~/pages/TaskCategories';
-import MyTask from '~/pages/MyTask';
-// Giả sử bạn đã tạo AuthLayout, nếu chưa thì import tạm DefaultLayout hoặc null
+import TaskCategories from '~/pages/TaskCategories/TaskCategories';
+import MyTask from '~/pages/MyTask/MyTask';
 import AuthLayout from '~/layouts/AuthLayout';
+
+// Giả định bạn sẽ tạo trang này để xem chi tiết 1 nhóm
+// Nếu chưa có, bạn có thể tạo file rỗng để không bị lỗi import
+// import GroupDetail from '~/pages/Group/GroupDetail';
+
+// Tạm thời dùng Dashboard làm placeholder cho GroupDetail để code không lỗi
+const GroupDetail = Dashboard;
 
 type RouteType = {
   path: string;
@@ -15,14 +21,14 @@ type RouteType = {
   layout?: React.FC<{ children: React.ReactNode }> | null;
 };
 
-// 1. PUBLIC ROUTES (Ai cũng vào được: Login, Register)
+// 1. PUBLIC ROUTES
 const publicRoutes: RouteType[] = [
   { path: '/login', component: Login, layout: AuthLayout },
   { path: '/register', component: Register, layout: AuthLayout },
-  { path: '/cart', component: Cart, layout: DefaultLayout }, // Tạm để cart ở đây
+  { path: '/cart', component: Cart, layout: DefaultLayout },
 ];
 
-// 2. PRIVATE ROUTES (Phải đăng nhập mới vào được: Dashboard)
+// 2. PRIVATE ROUTES
 const privateRoutes: RouteType[] = [
   { path: '/', component: Dashboard, layout: DefaultLayout },
   { path: '/calendar', component: Calendar, layout: DefaultLayout },
@@ -32,6 +38,9 @@ const privateRoutes: RouteType[] = [
     component: TaskCategories,
     layout: DefaultLayout,
   },
+
+  // Route mới cho Group (ví dụ: /groups/123abcxyz)
+  { path: '/groups/:groupId', component: GroupDetail, layout: DefaultLayout },
 ];
 
 export { publicRoutes, privateRoutes };

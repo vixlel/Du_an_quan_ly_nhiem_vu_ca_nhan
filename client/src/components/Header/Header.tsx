@@ -140,7 +140,9 @@ const Header = () => {
               <div className={cx('dropdownItem')}>
                 Hôm nay: {formatDate(now)}
               </div>
-              <div className={cx('dropdownItem')}>Xem toàn bộ lịch</div>
+              <div className={cx('dropdownItem')}>
+                <Link to="/calendar">Xem toàn bộ lịch</Link>
+              </div>
             </div>
           )}
         </div>
