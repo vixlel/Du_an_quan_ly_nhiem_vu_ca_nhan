@@ -16,7 +16,7 @@ import {
   Hash, // Icon đại diện cho ID hoặc Group
 } from 'lucide-react';
 import styles from './Sidebar.module.scss'; // Lưu ý check lại tên file (viết hoa/thường)
-import GroupModal from '~/components/GroupModal';
+import GroupModal from '~/components/GroupModal/GroupModal';
 
 const cx = classNames.bind(styles);
 

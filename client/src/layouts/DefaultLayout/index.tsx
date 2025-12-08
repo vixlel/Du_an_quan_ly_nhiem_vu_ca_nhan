@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import classNames from 'classnames/bind';
 import { ChevronUp } from 'lucide-react'; // Icon mũi tên lên
 
-import Footer from '~/components/Footer';
-import Header from '~/components/Header';
-import Sidebar from '~/components/Sidebar';
+import Footer from '~/components/Footer/Footer';
+import Header from '~/components/Header/Header';
+import Sidebar from '~/components/Sidebar/Sidebar';
 import styles from './DefaultLayout.module.scss';
 
 const cx = classNames.bind(styles);
