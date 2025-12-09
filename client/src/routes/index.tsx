@@ -2,6 +2,7 @@ import React from 'react';
 
 // Pages
 import Cart from '~/pages/Cart';
+import Help from '~/pages/Help/Help';
 import Group from '~/pages/Group/Group';
 import MyTask from '~/pages/MyTask/MyTask';
 import { Login, Register } from '~/pages/Auth';
@@ -18,7 +19,7 @@ import DefaultLayout from '~/layouts/DefaultLayout';
 // import GroupDetail from '~/pages/Group/GroupDetail';
 
 // Tạm thời dùng Dashboard làm placeholder cho GroupDetail để code không lỗi
-const GroupDetail = Dashboard;
+// const GroupDetail = Dashboard;
 
 type RouteType = {
   path: string;
@@ -36,6 +37,7 @@ const publicRoutes: RouteType[] = [
 // 2. PRIVATE ROUTES
 const privateRoutes: RouteType[] = [
   { path: '/', component: Dashboard, layout: DefaultLayout },
+  { path: '/help', component: Help, layout: DefaultLayout },
   { path: '/calendar', component: Calendar, layout: DefaultLayout },
   { path: '/my-task', component: MyTask, layout: DefaultLayout },
   {
