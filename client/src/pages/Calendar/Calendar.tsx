@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios'; // Import Axios
 import {
   format,
   startOfMonth,
@@ -25,55 +26,76 @@ import {
 } from 'lucide-react';
 import styles from './Calendar.module.scss';
 
-// --- TYPE DEFINITIONS ---
-export interface Task {
-  id: string;
+// --- 1. TYPE DEFINITIONS (Khớp với Backend) ---
+// Interface cho Task nhận từ API về
+export interface ITaskResponse {
+  _id: string; // MongoDB dùng _id
   title: string;
-  date: Date;
-  completed: boolean;
-  // Các trường mới theo design
   description?: string;
-  priority?: 'Extreme' | 'Moderate' | 'Low';
-  image?: string;
+  image?: string; // URL ảnh từ server
+  status: 'todo' | 'in_progress' | 'completed';
+  priority: 'low' | 'moderate' | 'extreme';
+  dueDate: string; // Date từ API thường là string ISO
+  category?: string;
 }
 
-// Mock Data Ban đầu
-const initialTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Họp team',
-    date: new Date(),
-    completed: false,
-    priority: 'Moderate',
-    description: 'Họp hàng tuần',
-  },
+// Mock Categories (Sau này sẽ gọi API lấy list này)
+const MOCK_CATEGORIES = [
+  { id: 'cat_1', name: 'Design' },
+  { id: 'cat_2', name: 'Development' },
+  { id: 'cat_3', name: 'Marketing' },
+  { id: 'cat_4', name: 'Meeting' },
 ];
 
 const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); // Mặc định chọn hôm nay
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // State quản lý View trong Modal: 'list' | 'form'
   const [modalView, setModalView] = useState<'list' | 'form'>('list');
 
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  // State lưu danh sách task
+  const [tasks, setTasks] = useState<ITaskResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form State
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
     title: string;
     description: string;
-    priority: 'Extreme' | 'Moderate' | 'Low';
-    image: string | null;
+    priority: 'extreme' | 'moderate' | 'low';
+    categoryId: string;
+    date: string; // <--- THÊM MỚI: Dùng string format 'yyyy-MM-dd' cho input date
+    imagePreview: string | null;
+    imageFile: File | null;
   }>({
     title: '',
     description: '',
-    priority: 'Low',
-    image: null,
+    priority: 'low',
+    categoryId: '',
+    date: '', // <--- Default rỗng
+    imagePreview: null,
+    imageFile: null,
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- 2. FETCH DATA TỪ API ---
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Lấy token đăng nhập
+      // Gọi API lấy toàn bộ task (hoặc filter theo tháng nếu backend hỗ trợ)
+      const res = await axios.get('http://localhost:5000/api/tasks', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(res.data.tasks || []); // Giả sử backend trả về { success: true, tasks: [...] }
+    } catch (error) {
+      console.error('Lỗi tải task:', error);
+    }
+  };
+
+  // Gọi fetchTasks khi component mount
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   // --- LOGIC LỊCH ---
   const monthStart = startOfMonth(currentDate);
@@ -89,83 +111,98 @@ const Calendar: React.FC = () => {
 
   const handleDayClick = (day: Date) => {
     setSelectedDate(day);
-    setModalView('list'); // Mặc định mở ra là xem list
+    setModalView('list');
     setIsModalOpen(true);
   };
 
   const tasksForSelectedDate = tasks.filter(
-    (t) => selectedDate && isSameDay(t.date, selectedDate)
+    (t) => selectedDate && isSameDay(new Date(t.dueDate), selectedDate)
   );
 
-  // Chuyển sang chế độ Thêm mới
+  // Cập nhật hàm mở form thêm mới (handleOpenAddForm)
   const handleOpenAddForm = () => {
-    setEditingId(null);
-    setFormData({ title: '', description: '', priority: 'Low', image: null });
-    setModalView('form');
-  };
-
-  // Chuyển sang chế độ Sửa
-  const handleOpenEditForm = (task: Task) => {
-    setEditingId(task.id);
     setFormData({
-      title: task.title,
-      description: task.description || '',
-      priority: task.priority || 'Low',
-      image: task.image || null,
+      title: '',
+      description: '',
+      priority: 'low',
+      categoryId: '',
+      // Set mặc định là ngày đang chọn bên ngoài lịch, format về yyyy-MM-dd
+      date: selectedDate
+        ? format(selectedDate, 'yyyy-MM-dd')
+        : format(new Date(), 'yyyy-MM-dd'),
+      imagePreview: null,
+      imageFile: null,
     });
     setModalView('form');
   };
 
-  // Upload Ảnh
+  // Xử lý chọn ảnh
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 1. Tạo URL để preview
       const url = URL.createObjectURL(file);
-      setFormData({ ...formData, image: url });
+      // 2. Lưu cả file gốc và url preview
+      setFormData({ ...formData, imagePreview: url, imageFile: file });
     }
   };
 
-  const handleSave = () => {
-    // Validate cơ bản
+  // --- 3. XỬ LÝ GỬI API (TẠO TASK) ---
+  const handleSave = async () => {
     if (!formData.title.trim() || !selectedDate) return;
 
-    // Chuẩn bị dữ liệu để lưu (convert image null -> undefined để khớp type Task)
-    const taskPayload = {
-      title: formData.title,
-      description: formData.description,
-      priority: formData.priority,
-      image: formData.image || undefined, // <--- SỬA LỖI Ở ĐÂY
-    };
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
 
-    if (editingId) {
-      // Logic Update
-      setTasks((prev) =>
-        prev.map((t) => (t.id === editingId ? { ...t, ...taskPayload } : t))
-      );
-    } else {
-      // Logic Create
-      const newTask: Task = {
-        id: Date.now().toString(),
-        date: selectedDate,
-        completed: false,
-        ...taskPayload,
-      };
-      setTasks([...tasks, newTask]);
+      // CHUẨN BỊ FORM DATA (Bắt buộc dùng FormData để gửi file)
+      const data = new FormData();
+      data.append('title', formData.title);
+      data.append('description', formData.description);
+      data.append('date', selectedDate.toISOString()); // Backend convert lại thành Date
+      data.append('priority', formData.priority);
+
+      if (formData.categoryId) {
+        data.append('categoryId', formData.categoryId);
+      }
+
+      // Chỉ append file nếu người dùng có chọn ảnh
+      if (formData.imageFile) {
+        data.append('image', formData.imageFile); // 'image' phải trùng với upload.single('image') ở backend
+      }
+
+      // Gửi Request
+      const res = await axios.post('http://localhost:5000/api/tasks', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.data.success) {
+        alert('Tạo task thành công!');
+        // Refresh lại list task
+        fetchTasks();
+        setModalView('list');
+      }
+    } catch (error) {
+      console.error('Lỗi tạo task:', error);
+      alert('Có lỗi xảy ra, vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
     }
-
-    // Quay về list sau khi save
-    setModalView('list');
   };
 
-  const handleDeleteTask = (id: string) => {
+  const handleDeleteTask = async (id: string) => {
     if (window.confirm('Bạn có chắc muốn xóa?')) {
-      setTasks((prev) => prev.filter((t) => t.id !== id));
+      // Gọi API xóa (Bạn cần làm thêm API delete bên backend)
+      // await axios.delete(...)
+      console.log('Delete logic here for ID:', id);
     }
   };
 
   // --- RENDER HELPERS ---
 
-  // 1. Render View: Danh sách Task (Giao diện cũ nhưng cleanup lại)
   const renderListView = () => (
     <>
       <div className={styles.modalHeader} style={{ borderBottom: 'none' }}>
@@ -189,20 +226,37 @@ const Calendar: React.FC = () => {
           <p className={styles.emptyText}>Chưa có công việc nào.</p>
         )}
         {tasksForSelectedDate.map((task) => (
-          <li key={task.id} className={styles.taskItem}>
-            <div
-              style={{ flex: 1, cursor: 'pointer' }}
-              onClick={() => handleOpenEditForm(task)}
-            >
+          <li key={task._id} className={styles.taskItem}>
+            <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 600 }}>{task.title}</div>
-              <div style={{ fontSize: 12, color: '#64748b' }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: '#64748b',
+                  textTransform: 'capitalize',
+                }}
+              >
                 {task.priority} •{' '}
                 {task.description ? 'Có mô tả' : 'Không mô tả'}
               </div>
             </div>
+            {/* Hiển thị ảnh nhỏ nếu có */}
+            {task.image && (
+              <img
+                src={`http://localhost:5000/${task.image}`}
+                alt="Task"
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 4,
+                  objectFit: 'cover',
+                  marginRight: 10,
+                }}
+              />
+            )}
             <button
               className={styles.deleteBtn}
-              onClick={() => handleDeleteTask(task.id)}
+              onClick={() => handleDeleteTask(task._id)}
             >
               <Trash2 size={16} />
             </button>
@@ -212,11 +266,10 @@ const Calendar: React.FC = () => {
     </>
   );
 
-  // 2. Render View: Form (Giao diện mới theo Design)
   const renderFormView = () => (
     <>
       <div className={styles.formHeader}>
-        <h3>{editingId ? 'Edit Task' : 'Add New Task'}</h3>
+        <h3>Add New Task</h3>
         <button
           className={styles.goBackBtn}
           onClick={() => setModalView('list')}
@@ -226,7 +279,7 @@ const Calendar: React.FC = () => {
       </div>
 
       <div className={styles.formBody}>
-        {/* Hàng 1: Title */}
+        {/* Title */}
         <div className={styles.formGroup}>
           <label>Title</label>
           <input
@@ -239,25 +292,69 @@ const Calendar: React.FC = () => {
           />
         </div>
 
-        {/* Hàng 2: Date */}
-        <div className={styles.formGroup}>
-          <label>Date</label>
-          <div className={styles.dateDisplay}>
-            <span>
-              {selectedDate ? format(selectedDate, 'dd/MM/yyyy') : ''}
-            </span>
-            <CalendarIcon size={18} />
+        {/* Date & Category (New Row) */}
+        <div className={styles.formRow}>
+          <div className={styles.leftColumn} style={{ flex: 1 }}>
+            <div className={styles.formGroup}>
+              <label>Date</label>
+              {/* THAY ĐỔI Ở ĐÂY: Dùng input type="date" */}
+              <input
+                type="date"
+                className={styles.dateInput} // Cần thêm class này vào CSS nhé
+                value={formData.date}
+                onChange={(e) =>
+                  setFormData({ ...formData, date: e.target.value })
+                }
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  color: 'var(--text-main)',
+                }}
+              />
+            </div>
+          </div>
+          <div className={styles.rightColumn} style={{ flex: 1 }}>
+            {/* THÊM PHẦN CHỌN CATEGORY */}
+            <div className={styles.formGroup}>
+              <label>Category</label>
+              <select
+                className={styles.selectInput} // Bạn cần thêm class này vào css hoặc dùng tạm input style
+                value={formData.categoryId}
+                onChange={(e) =>
+                  setFormData({ ...formData, categoryId: e.target.value })
+                }
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  outline: 'none',
+                }}
+              >
+                <option value="">Select Category</option>
+                {MOCK_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Hàng 3: Priority */}
+        {/* Priority */}
         <div className={styles.formGroup}>
           <label>Priority</label>
           <div className={styles.priorityGroup}>
             {[
-              { label: 'Extreme', color: '#ef4444', value: 'Extreme' },
-              { label: 'Moderate', color: '#3b82f6', value: 'Moderate' },
-              { label: 'Low', color: '#22c55e', value: 'Low' },
+              { label: 'Extreme', color: '#ef4444', value: 'extreme' },
+              { label: 'Moderate', color: '#3b82f6', value: 'moderate' },
+              { label: 'Low', color: '#22c55e', value: 'low' },
             ].map((option) => (
               <div
                 key={option.value}
@@ -283,7 +380,7 @@ const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Hàng 4: 2 Cột (Desc & Image) */}
+        {/* Desc & Image */}
         <div className={styles.formRow}>
           <div className={styles.leftColumn}>
             <div className={styles.formGroup}>
@@ -312,9 +409,9 @@ const Calendar: React.FC = () => {
                   accept="image/*"
                   onChange={handleImageChange}
                 />
-                {formData.image ? (
+                {formData.imagePreview ? (
                   <img
-                    src={formData.image}
+                    src={formData.imagePreview}
                     alt="Preview"
                     className={styles.previewImage}
                   />
@@ -332,9 +429,12 @@ const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Nút Done */}
-        <button className={styles.doneBtn} onClick={handleSave}>
-          Done
+        <button
+          className={styles.doneBtn}
+          onClick={handleSave}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Saving...' : 'Done'}
         </button>
       </div>
     </>
@@ -351,8 +451,9 @@ const Calendar: React.FC = () => {
       }}
     >
       <div className={styles.calendarContainer}>
-        {/* HEADER LỊCH */}
+        {/* HEADER & GRID... (Giữ nguyên như code cũ) */}
         <div className={styles.header}>
+          {/* ... code cũ giữ nguyên ... */}
           <div className={styles.headerTitle}>
             <h2>{format(currentDate, 'MMMM yyyy', { locale: vi })}</h2>
           </div>
@@ -367,7 +468,6 @@ const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* GRID THỨ */}
         <div className={styles.weekDaysGrid}>
           {weekDays.map((day) => (
             <div key={day} className={styles.weekDayCell}>
@@ -376,23 +476,25 @@ const Calendar: React.FC = () => {
           ))}
         </div>
 
-        {/* GRID NGÀY */}
         <div className={styles.daysGrid}>
           {calendarDays.map((day, index) => {
-            const dayTasks = tasks.filter((t) => isSameDay(t.date, day));
+            // Filter task theo ngày (so sánh dueDate với day)
+            const dayTasks = tasks.filter((t) =>
+              isSameDay(new Date(t.dueDate), day)
+            );
             const isCurrentMonth = isSameMonth(day, monthStart);
             return (
               <div
                 key={index}
-                className={`${styles.dayCell} 
-                  ${!isCurrentMonth ? styles.disabled : ''} 
-                  ${isToday(day) ? styles.today : ''}`}
+                className={`${styles.dayCell} ${
+                  !isCurrentMonth ? styles.disabled : ''
+                } ${isToday(day) ? styles.today : ''}`}
                 onClick={() => handleDayClick(day)}
               >
                 <div className={styles.dateNumber}>{format(day, 'd')}</div>
                 <div className={styles.taskPreviewList}>
                   {dayTasks.slice(0, 2).map((t) => (
-                    <div key={t.id} className={styles.taskDot} title={t.title}>
+                    <div key={t._id} className={styles.taskDot} title={t.title}>
                       {t.title}
                     </div>
                   ))}
@@ -417,7 +519,6 @@ const Calendar: React.FC = () => {
               className={styles.modalContent}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* ĐIỀU KIỆN RENDER: LIST HOẶC FORM */}
               {modalView === 'list' ? renderListView() : renderFormView()}
             </div>
           </div>
